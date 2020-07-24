@@ -1,0 +1,157 @@
+%%\title{Physical Elements and Markers}
+%  Changed by: Chris ISELIN, 24-Jan-1997 
+%  Changed by: Hans Grote, 25-Sep-2002
+
+\chapter{Definition of Elements}
+\label{chap:element-definition}
+
+\section{Element Input Format}
+\label{sec:element-input}
+
+All physical elements are defined by statements of the form 
+\madbox{
+label: keyword \{,attribute\};
+}
+where 
+\begin{madlist}
+  \ttitem{label} is a name to be given to the element.
+  \ttitem{keyword} is an element type keyword.  
+  \ttitem{attribute} normally -- with exception for multipoles -- takes
+  one of the two forms: 
+    \madxmp{attribute-name \== attribute-value \\ 
+    attribute-name \>:= attribute-value}
+    \begin{madlist}
+      \ttitem{attribute-name} selects the attribute,
+      as defined for the element type keyword.   
+      \ttitem{attribute-value} provides a value to the
+      \texttt{attribute\_name}. The value may be specified by an
+      expression. 
+    \end{madlist}
+    The "=" assigns the value on the right to
+    the attribute at the time of definition, regardless of any
+    further change of the right hand side; the ":=" re-evaluates
+    the expression at the right every time the attribute is being
+    used. For constant right hand sides, "=" and ":=" are of
+    course equivalent.  
+\end{madlist}
+
+Omitted attributes are assigned a default value.
+
+\textbf{Example:} 
+\madxmp{QF: QUADRUPOLE, L=1.8, K1=0.015832;}
+
+A special format is used for a
+\hyperref[sec:multipole]{multipole}\index{multipole}:  
+\madxmp{
+M: MULTIPOLE, \= KN= {kn0, kn1, kn2, ..., knmax},\\
+              \> KS= {ks0, ks1, ks2, ..., ksmax};
+}
+where \texttt{KN} and \texttt{KS} give the integrated normal and skew strengths,
+respectively. The commas are mandatory, each strength can be an
+expression; their position defines the order.\\
+\textbf{Example:}  
+\madxmp{M: MULTIPOLE, KN={0,0,0,myoct*lrad}, KS={0,0,0,0,-1.e-5};}
+defines a multipole with a normal octupole component and a skew decapole
+component.  
+
+%\input{Introduction/elm_edit}
+\section{Editing Element Definitions}  
+\label{sec:element-editing}
+
+An element definition can be changed in two ways: 
+\begin{itemize}
+   \item \textbf{Entering a new definition:} The element will be
+     replaced in the main beam line expansion.  
+   \item \textbf{Entering the element name together with new
+     attributes:} The element will be updated in place, and the new
+     attribute values will replace the old ones.  
+\end{itemize} 
+
+This example shows two ways to change the strength of a quadrupole: 
+\madxmp{
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\= \kill
+QF: QUADRUPOLE, L = 1, K1 = 0.01;    \>! Original definition of QF \\
+\\
+QF: QUADRUPOLE, L = 2, K1 = 0.02;    \>! Replace whole definition of QF \\
+\\
+QF, K1 = 0.03;                       \>! Replace value of K1 for QF\\
+}
+When the type of the element remains the same, replacement of an
+attribute is the more efficient way.  
+
+Element definitions can be edited freely. The changes only affect
+already defined objects which belong to its
+\hyperref[sec:element-classes]{element class} in case the: \madxmp{option, update\_from\_parent} is used.
+In case this option is used all elements which belong to that class will be updated. 
+An example is given in \hyperref[sec:element-classes]{element class}.   
+
+
+%\input{Introduction/elm_class}
+\section{Element Classes}  
+\label{sec:element-classes}
+The concept of element classes solves the problem of addressing
+instances of elements in the accelerator in a convenient manner. 
+
+It will first be explained by an example. All the quadrupoles in the
+accelerator form a class QUADRUPOLE. Let us define three subclasses for the
+focussing quadrupoles, the defocussing quadrupoles, and the skewed
+quadrupoles:  
+\madxmp{
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\= \kill
+MQF: QUADRUPOLE, L = LQM, K1 = KQD;     \>! Focussing quadrupoles \\
+MQD: QUADRUPOLE, L = LQM, K1 = KQF;     \>! Defocussing quadrupoles \\
+MQT: QUADRUPOLE, L = LQT;               \>! Skewed quadrupoles
+}
+
+These classes can be thought of as new keywords which define elements
+with specified default attributes. We now use these classes to define
+the real quadrupoles:  
+\madxmp{
+xxxxxxxxxxxxxxxxxxxxxxx\= \kill
+QD1: MQD;              \>! Defocussing quadrupoles \\
+QD2: MQD; \\
+QD3: MQD; \\
+ ... \\
+QF1: MQF;              \>! Focussing quadrupoles \\
+QF2: MQF; \\
+QF3: MQF; \\
+ ... \\
+QT1: MQT, K1S = KQT1;   \> ! Skewed quadrupoles \\
+QT2: MQT, K1S = KQT2; \\
+ ...
+}
+These quadrupoles inherit from their class all attributes that are not
+explicitly specified at time of declaration. 
+This allows to build up a hierarchy of objects with a rather
+economic input structure.  
+
+The full power of the class concept is revealed when object classes are
+used to select instances of elements for various purposes. Example:  
+
+
+\madxmp{
+SELECT, FLAG=twiss, CLASS = QUADRUPOLE; \=! Select all quadrupoles for the\\
+                                        \>! Twiss TFS file
+}
+
+More formally, for each element keyword \madx maintains a class of
+elements with the same name. A defined element becomes itself a class
+which can be used to define new objects, which will become members of
+this class. A new object inherits all attributes from its class; but its
+definition may override some of those values by new ones. All class and
+object names can be used in range selections, providing a powerful
+mechanism to specify positions for matching constraints and printing.
+
+The default option is that if you change the parent of an element you will
+not change the children of that class. Let's see in the following example how 
+it works:
+\madxmp{ mb: sbend,l:=lenseq,  angle =0.001; \\
+ mb2: mb;
+ }
+ This will create an element \texttt{mb} that then is used as the parent for \texttt{mb2}. If we now do want to give mb
+ an aperture we can do the following:
+ \madxmp{ apertype=ellipse, aperture:={ 1,4 }; }
+
+ This, however, does not modify \texttt{mb2}. In case we want \texttt{mb2} to also inherent the change from \texttt{mb} we need to use the
+ flag \madxmp{option, update\_from\_parent}. This should be used with care and is only changing the direct parent.
+%% EOF

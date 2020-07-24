@@ -1,0 +1,359 @@
+%%%\title{Sequence Editor}
+%  Changed by: Chris ISELIN, 24-Feb-1998 
+%  Changed by: Hans Grote, 17-Jun-2002 
+
+\chapter{Sequence Editor}
+\label{chap:seqedit}
+With the help of a few commands, an existing sequence may be
+modified in many ways: in the case of a circular machine, the starting point of 
+the sequence can be moved to another place;
+the order of elements can be inverted; elements can be inserted one by
+one, or as a whole group with one single command; single elements, or
+classes thereof can be removed; elements can be replaced by others;
+finally, the sequence can be "flattened", i.e. all inserted sequences
+are replaced by their actual elements, such that a flattened sequence
+contains only elements. 
+
+It is good practice to add a \hyperref[sec:flatten]{\texttt{FLATTEN}}
+statement at the end of a \texttt{SEQEDIT} operation to ensure a fully
+operational sequence. This is particularly useful for the 
+\hyperref[sec:save]{\texttt{SAVE}} command to properly save
+\textit{shared sequences} and to write them out in \madeight format. 
+
+
+%% 2013-Jul-11  17:35:46  ghislain: need a synopsis paragraph similar to
+%% what PTC offers and a complement of a few examples using all commands
+%% shown here...
+
+\section{SEQEDIT}
+\label{sec:seqedit}
+\madx provides an environment for the edition of sequences that is invoked with 
+the command:
+\madbox{SEQEDIT, SEQUENCE=string;}
+The only attribute is the name of the sequence to be edited. 
+
+The editing is performed on the sequence as provided by the user and before it 
+is expanded with the \hyperref[sec:use]{\texttt{USE}} command. 
+At the end of sequence edition, the resulting sequence must be expanded through 
+the \hyperref[sec:use]{\texttt{USE}} command as necessary.
+
+\section{FLATTEN}
+\label{sec:flatten}
+Sequences can be built from elements but also sub-sequences resulting in a 
+nested structure (see chapter \ref{chap:sequence} on sequence definition). 
+The positioning of elements within a sequence can also be specified with values 
+or expressions, and by reference to other elements.
+
+\madx provides a command to resolve these dependencies and transform a complex 
+sequence into a simple list of elements with positioning values referring to 
+the start of the sequence, discarding the user-specified expressions for the 
+positioning.
+
+This command takes no argument: 
+\madbox{
+FLATTEN;
+}
+
+If the sequence being edited contains sub-sequences, \texttt{FLATTEN}
+recursively includes all sub-sequences until the sequence is only
+composed of a simple list of elements. 
+
+\texttt{FLATTEN} also resolves the positioning of each element within
+the sequence to a single value with reference to the start of the
+sequence and updates the \texttt{AT} attribute of that element while
+also discarding the user-specified expression if present.
+
+The \texttt{FLATTEN} command is recommended at the beginning of sequence
+edition as well as at the very end as in
+\madxmp{
+SEQEDIT, \=SEQUENCE=name; \\
+	 \>FLATTEN; \\
+	 \>\ldots commands to edit the named sequence\ldots \\
+	 \>FLATTEN; \\
+ENDEDIT;
+}
+
+\section{CYCLE}
+\label{sec:cycle}
+\madbox{
+CYCLE, START=string;
+}
+This makes the sequence start at the location given as attribute value
+of the \texttt{START} attribute. The element named by the \texttt{START}
+attribute must be a marker. \\  
+In case there is a shared sequence in the used sequence, the
+command \texttt{FLATTEN} should be used before the command
+\texttt{CYCLE}. \\ 
+Example:  
+\madxmp{
+FLATTEN; \\
+CYCLE, START=place; 
+}
+
+Note that the \texttt{FLATTEN} command inserts another marker before the
+start location, with a name composed of the name of the sequence being
+edited, followed by the start location name and the string "\_P\_". 
+
+\section{REFLECT}
+\label{sec:reflect}
+\madbox{REFLECT;}
+This inverts the order of element in the sequence, starting from the
+last element. \\ 
+If there are shared sequences inside the
+\hyperref[sec:use]{\texttt{USE}}d sequence,  
+the command \texttt{FLATTEN} must be used before the command
+\texttt{REFLECT}.   
+Alternatively each shared sequence must first be reflected. Example:   
+\madxmp{
+FLATTEN;\\
+REFLECT; 
+}
+
+
+\section{INSTALL}
+\label{sec:install}
+\madbox{
+  INSTALL, \= ELEMENT=string, CLASS=string, \\
+           \> AT=real, FROM=\{string|SELECTED\};
+}
+where the parameters have the following meaning: 
+\begin{madlist}
+   \ttitem{ELEMENT} name of the (new) element to be inserted (mandatory) 
+
+   \ttitem{CLASS} class of the new element to be inserted (mandatory) 
+
+   \ttitem{AT} position where the element is to be inserted; if no "from"
+     is given,this is relative to the start of the sequence. If "from"
+     is given, it is relative to the position specified there. 
+
+   \ttitem{FROM} either a place (i.e. the name(+occurrence count) of an
+     element already existing in the sequence, e.g. mb[15], or
+     mq.a..i1..4 etc.; or the string \texttt{SELECTED}; in the latter
+     case an element of the type specified will be inserted behind all
+     elements in the sequence that are currently selected by one or several
+     \hyperref[sec:select]{\texttt{SELECT}} commands of the type 
+     \madxmp{SELECT, FLAG=seqedit, CLASS=.., PATTERN=.., RANGE=..;}
+\end{madlist}
+
+\textbf{Note:} No element definition can occur inside a \texttt{SEQEDIT
+  ... ENDEDIT} block.
+
+
+\section{MOVE}
+\label{sec:move}
+\madbox{
+MOVE, ELEMENT=\{string|SELECTED\}, BY=real, TO=real, FROM=string;
+}
+\begin{madlist}
+  \ttitem{ELEMENT} name of the existing element to be moved, or
+  "SELECTED", in which case all elements from existing
+  \hyperref[sec:select]{\texttt{SELECT}} commands will be moved;
+  in the latter case, the \texttt{BY} attribute must be given.  
+  \ttitem{BY} distance by which the element(s) is/are to be moved; no
+  \texttt{TO} or \texttt{FROM} attributes should be given in this case.  
+  \ttitem{TO} position to which the element has to be moved; if no
+  \texttt{FROM} attribute is given, the position is relative to the
+  start of the sequence; otherwise, it is relative to the location
+  given in the \texttt{FROM} argument   
+  \ttitem{FROM} place in the sequence with respect to which the element
+  is to be positioned.  
+\end{madlist}
+
+\section{REMOVE}
+\label{sec:remove}
+\madbox{
+REMOVE, ELEMENT=\{string|SELECTED\};
+}
+\begin{madlist}
+  \ttitem{ELEMENT} name of existing element(s) to be removed. \\
+  The special case \texttt{ELEMENT = SELECTED} removes all elements
+  previously selected by \hyperref[sec:select]{\texttt{SELECT}} commands
+\end{madlist}
+
+\textbf{Note:} \madx expects to find some special markers in a beam line and it  
+is therefore dangerous to remove all markers from a sequence! In particular the 
+\texttt{START=...} marker and markers added by a \hyperref[sec:cycle]{\texttt{CYCLE}} 
+command must never be removed from a sequence.
+
+
+\section{REPLACE}
+\label{sec:replace}
+\madbox{
+REPLACE, ELEMENT=\{string|SELECTED\}, BY=string;
+}
+
+The parameters are defined as:
+\begin{madlist}
+  \ttitem{ELEMENT} names the elements to be replaced. \\
+  The special case \texttt{ELEMENT = SELECTED} replaces all elements previously 
+  selected by \hyperref[sec:select]{\texttt{SELECT}} commands 
+  
+  \ttitem{BY} names the elements replacing the elements selected for 
+  replacement.
+\end{madlist}
+
+\section{EXTRACT}
+\label{sec:extract}
+A new sequence can be extracted as a subset of an existing sequence. The 
+extracted sequence is given a new name and can be
+\hyperref[sec:use]{\texttt{USE}}d as any user defined sequence.
+\madbox{
+  EXTRACT, \= SEQUENCE=string, FROM=string, TO=string, \\
+           \> NEWNAME=string;
+}
+
+The parameters are defined as:
+\begin{madlist}
+\ttitem{SEQUENCE} the name of the existing sequence from which the new sequence 
+is extracted.
+
+\ttitem{FROM} the name of an element in the sequence that becomes the first 
+element of the extracted sequence.
+
+\ttitem{TO} the name of an element in the sequence that becomes the last 
+element of the extracted sequence. 
+
+\ttitem{NEWNAME} the name of the extracted sequence. 
+\end{madlist}
+
+
+The extracted sequence is declared as \hyperref[chap:sequence]{\texttt{SHARE}}d and
+can therefore be combined \textsl{e.g.} into the cycled original sequence.
+
+\textbf{Note:} the element given by the \texttt{FROM} attribute must be
+located, in the existing sequence, before the element given by the
+\texttt{TO} attribute, or \madx fails with a fatal error. 
+In the case of circular sequences, this can be ensured by performing a 
+\hyperref[sec:cycle]{\texttt{CYCLE}} of the original sequence with
+\texttt{START} pointing to the same element given in the \texttt{FROM}
+attribute of the \texttt{EXTRACT} command. 
+
+
+\section{ENDEDIT}
+\label{sec:endedit}
+The sequence editing environment is closed with the command
+\madbox{ENDEDIT;}
+The nodes in the sequence are finally renumbered according to their occurrence 
+which might have changed during editing.
+
+
+
+
+\section{SAVE}
+\label{sec:save}
+
+The \texttt{SAVE} command saves a sequence to a specified file together with all 
+relevant information.
+
+\madbox{
+SAVE, \=SEQUENCE=string{,string}, FILE=filename, \\
+      \>BEAM=logical, BARE=logical, MAD8=logical, \\
+      \>NOEXPR=logical, NEWNAME=string;
+}
+
+The parameters are defined as: 
+\begin{madlist}
+	\ttitem{SEQUENCE} lists the sequences to be saved, separated by commas. 
+	This attribute is optional and when omitted, all known 
+	sequences are saved. \\
+	However, because of internal inconsistencies that can result in spurious 
+	entries in the output file, the user is strongly advised to always provide 
+	explicitly the names of sequences to be saved.
+
+	\ttitem{FILE} the filename of the output file. (Default: "save")
+
+	\ttitem{BEAM} an optional flag to specify that all beams linked to the
+	specified sequences are saved at the top of the output file.
+
+	\ttitem{BARE} an optional flag to save only the sequence without the
+	element definitions nor beam information. This allows to re-read in a
+	sequence with might otherwise create a stop of the program. This is
+	particularly useful to turn a line into a sequence in order to further edit 
+	it with \hyperref[sec:seqedit]{\texttt{SEQEDIT}}.
+
+	\ttitem{MAD8} an optional flag to request that the sequences should be  
+	saved using \madeight input format.
+
+	\ttitem{NOEXPR} an optional flag to save values of expressions 
+	instead of the expressions themselves: the expressions in commands 
+	and variables are expanded and evaluated before saving.
+	This option must be used with care because the exported values were not deeply
+	checked and the code that writes variables and commands is widely spread
+	in the internal structure. \\
+	This option does not apply only for the saving of sequences in \madeight format. 
+
+	\ttitem {NEWNAME} provides a name for the saved sequence, overriding the 
+	original name. (see \hyperref[sec:extract]{\texttt{EXTRACT}} above)
+\end{madlist}
+
+Any number of \texttt{SELECT, FLAG=save, ...} commands may precede
+the \texttt{SAVE} command. In that case, the names of elements, variables, and
+sequences must match the pattern(s) if given, and in addition the
+elements must be of the class(es) specified. 
+
+%% See here for a
+%% \href{../Introduction/select.html#save_select}{SAVE with SELECT}
+%% example.  
+
+The precision of the output of the \texttt{SAVE} command depends on the
+defined output precision for \madx, which can be adjusted with the 
+\hyperref[sec:set]{\texttt{SET, FORMAT...}} command.
+
+%Details about default
+%precision and how to adjust it can be found at the
+%\href{../Introduction/set.html#Format}{SET Format} instruction page.   
+ 
+Note that with \texttt{BARE=false} the saved sequence may contain redundant 
+efinitions of elements, \textsl{i.e.} the same element is defined in the
+declaration  of elements in the form \texttt{label:\ type...} and in the
+sequence itself in the form \texttt{label:\ type, at=...}. This is
+flagged by \madx as implicit element redefinition and is ignored but a
+warning is issued.  
+
+Example:  
+\begin{verbatim}
+tl3: LINE = ( ldl6, qtl301, mqn, qtl301, ldl7, qtl302,
+                            mqn, qtl302, ldl8, ison);
+dltl3: LINE=(delay, tl3);
+
+Use, period=dltl3;
+
+Save, sequence=dltl3, file=t1, bare; // only sequence is saved
+
+Call, file=t1; // sequence is read in and is now a "real" sequence
+// if the two preceding lines are suppressed, seqedit will print a warning
+// and else do nothing
+
+Use, period=dltl3;
+
+Twiss, save, betx=bxa, alfx=alfxa, bety=bya, alfy=alfya;
+
+Plot, vaxis=betx, bety, haxis=s, colour:=100;
+
+SEQEDIT, SEQUENCE=dltl3;
+  remove,element=cx.bhe0330;
+  remove,element=cd.bhe0330;
+ENDEDIT;
+
+Use, period=dltl3;
+Twiss, save, betx=bxa, alfx=alfxa, bety=bya, alfy=alfya;
+\end{verbatim}
+
+
+\section{DUMPSEQU}
+\label{sec:dumpsequ}
+\madbox{
+DUMPSEQU, SEQUENCE=string, LEVEL=integer;
+}
+This command is actually more of a debug statement, but it may come handy at certain
+occasions. The argument of the \texttt{SEQUENCE} attribute is the name of an
+already expanded (i.e. \hyperref[sec:use]{\texttt{USE}}d) sequence. The amount of 
+detail in the output is controlled by the \texttt{LEVEL} argument:
+\begin{itemize}
+\item[$=0$ : ]    print only the cumulative node length = sequence length
+\item[$>0$ : ]    print all node (element) names except drifts
+\item[$>2$ : ]    print all nodes with their attached parameters
+\item[$>3$ : ]    print all nodes, and their elements with all parameters
+\end{itemize}
+
+%% EOF

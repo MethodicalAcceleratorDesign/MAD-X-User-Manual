@@ -1,0 +1,32 @@
+%%\title{MAD-X PLUG-INS}
+
+\section{MAD-X PLUGINS}
+
+\madx provides a plug-in mechanism for functionality extensions. Plug-in
+technique does not require linking at build time. The job is done at the
+time plug-in is loaded by the dynamic linker.  In order to use any
+plug-in, the plugin support must be compiled in \madx. At the top of
+every \madx makefile there is variable PLUGIN\_SUPPORT that must be set
+to "YES".  Then, the appropriate C interface is compiled in and \madx is
+linked dynamically.   Plug-ins must be accessible to the dynamic linker.
+The default location where plug-ins are searched is
+\$HOME/.madx/plugins. Otherwise, the directory containing the library
+must be either listed in   
+\begin{enumerate}
+   \item  the configuration file of the dynamic linker (on SLC3 it is
+     /etc/ld.so.conf)  
+   \item  \texttt{LD\_LIBRARY\_PATH} environment variable 
+\end{enumerate}
+
+Existing plug-ins  
+\begin{enumerate}
+   \item \texttt{RPLOT}
+\end{enumerate}
+
+\textbf{ Example }\\
+
+\textbf{ PROGRAMMERS MANUAL  }\\
+
+The interface is not yet fully defined. The documentation apears at the moment it happens.   
+
+

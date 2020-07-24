@@ -1,0 +1,367 @@
+\chapter*{Change Log}
+\label{chap:changelog}
+\addcontentsline{toc}{chapter}{Change Log}
+
+\begin{center} 
+\textbf{since version 5.02.00}
+\end{center}
+
+The following changes have been made to the documentation since
+August 15th, 2014 in version 5.02.02
+
+The changes are indexed by date (most recent first) and provide the \madx 
+version number where the change applies. 
+
+\begin{madlist}
+  \ttitem{2018-Jun-07} version 5.04.01 \\
+  Added information about the SixTrack option long\_names in the chapter: \hyperref[chap:sixtrack]{\texttt{SixTrack}}.
+
+  \ttitem{2018-Apr-23} version 5.04.01 \\
+  Fix definition of \texttt{E1} and \texttt{E2} in \hyperref[sec:bend]{\texttt{Bending Magnet}}.
+	
+  \ttitem{2017-Oct-20} version 5.03.07 \\
+Added a comment about the relation between \hyperref[sec:track]{\texttt{ONEPASS}} and \hyperref[sec:option]{\texttt{BBORBIT}} for \hyperref[chap:thintrack]{\texttt{TRACK}}.
+
+  \ttitem{2017-Oct-17} version 5.03.07 \\
+Fix a typo in the definition of the time in the cannonical variables.
+
+%  \ttitem{2017-Aug-7} version 5.03.06, \texttt{2a65d00c} \\
+%   Removed sharing of implicit drifts. The drifts do not have globally unique names anymore and are only accessible within the context of a sequence. The objects are now created using a shallow copy.
+
+%  \ttitem{2017-Jun-27} version 5.03.06, \texttt{92a1be1a} \\
+%  Can use sigma matrix elements as constraints.
+
+  \ttitem{2017-Jun-27} version 5.03.07 \\
+  Add \texttt{SELECT, flag=interpolate} option to select positions for
+  intermediate values during \texttt{TWISS}.
+
+%  \ttitem{2017-Jun-26} version 5.03.06, \texttt{d028e6c5} \\
+%  Refactor and simplify \texttt{TWISS} code for \texttt{CENTRE}.
+
+%  \ttitem{2017-Jun-26} version 5.03.06, \texttt{73dc378b} \\
+%  Decrease node size and avoid needless copies during matching.
+
+%  \ttitem{2017-Jun-26} version 5.03.06, \texttt{1e698ee1} \\
+%  Fix \texttt{INTERPOLATE} option of \texttt{PLOT}/\texttt{APERTURE} erasing expressions in elements (resolves issues \#377, \#404).
+
+%  \ttitem{2017-Jun-23} version 5.03.06, r6315, \texttt{f80b9ac9} \\
+%  Migrate MAD-X to github: \\
+%  \url{https://github.com/MethodicalAcceleratorDesign/MAD-X}
+
+%  \ttitem{2017-May-29} version 5.03.06, r6285, r6286, r6288 \\
+%  Fix cmake config for building with GC on windows.
+
+  \ttitemn{2017-May-29} version 5.03.06 \\
+  Add $p_s$ definition and (local) phase slip factor. \\
+ Move \texttt{PTC\_SETSWITCH} description right after \texttt{PTC\_CREATE\_LAYOUT}.
+
+  \ttitemn{2017-Apr-11} version 5.03.00 \\
+  Allow Track to specify a new seed for the quantum attribute.
+
+  \ttitemn{2017-Apr-11} version 5.03.00 \\
+  New random number generator with independent streams.
+
+%  \ttitemn{2016-Dec-21} version 5.02.13, r6053 \\
+%  New dev release.
+
+  \ttitemn{2016-Dec-20} version 5.02.13, r6049 \\
+  Lrad and tilt added to monitors for users' convenience, but not used internally.
+
+%  \ttitemn{2016-Dec-20} version 5.02.13, r6048, r6051 \\
+%  Bug fix in Survey, BV flags now affects angles, including TILT, update of TI8 sequence.
+  
+%  \ttitemn{2016-Dec-12} version 5.02.13, r6037 \\
+%  Makethin updated to not share exit slice of thick quadrupole.
+ 
+  \ttitemn{2016-Dec-9} version 5.02.13, r6031, r6032 \\
+  New command setvars\_knob and fill\_knob.
+  
+%  \ttitemn{2016-Dec-2} version 5.02.13, r6024 \\
+%  Added maxaper checks in Track (was partially ignored).
+
+%  \ttitemn{2016-Nov-29} version 5.02.13, r6019 \\
+%  Space charge finalization, bug fix in tilt for dipedge, bux fix in relativistic beta.
+
+  \ttitemn{2016-Nov-28} version 5.02.13, r6018 \\
+  K1 implementation in thick sbend in track.
+
+%  \ttitemn{2016-Nov-15} version 5.02.13, r6005 \\
+%  Bug fix in chrom option when twiss fails.
+
+  \ttitemn{2016-Nov-14} version 5.02.13, r6003 \\
+  Field errors ksl0 added to kickers.
+
+%  \ttitemn{2016-Nov-2} version 5.02.13, r5992 \\
+%  TKicker restored in Track and Twiss and disabled to orbit correction.
+
+%  \ttitemn{2016-Oct-15} version 5.02.12, r5969 \\
+%  New dev release: Bug fix in coupling logic, bug fix in Track command, bug fix in parser (i.e. extra ')'). New keeptrack option for Run command. Minor improvement to build system. New tests on Petra IV strongly coupled lattice.
+
+%  \ttitemn{2016-Oct-12} version 5.02.11, r5952 \\
+%  New dev release
+
+%  \ttitemn{2016-Oct-07} version 5.02.10, r5950, 5947, 5945\\
+%    some bugs fixes: bug in parser, bug in \texttt{SETERR} command for number of colums in the table , bug in arrays dimension of POL\_BLOCK\_sagan, etc 
+
+  \ttitemn{2016-Sep-30} version 5.02.10, r5946 \\
+   add flag to export all markers to Sixtrack
+
+%  \ttitemn{2016-Sep-24} version 5.02.10, r5942, 5936, 5928 \\
+%    \hyperref[sec:coupling]{coupling} fixes. Modes flip and stability checkes, as well as simplecticity checks, were added to the coupling calculation.  
+  
+%  \ttitemn{2016-Sep-21} version 5.02.10, r5937 \\
+%    improvement of the CMake build system 
+  
+%  \ttitemn{2016-Jul-06}version 5.02.11, r5913, 5915\\
+%    bug fixes caused by all variables initialized within declaration in Fortran 95 
+
+  \ttitemn{2016-Jun-15} version 5.02.10, r5909 \\
+   sigma matrix added to \hyperref[chap:twiss]{Twiss table}:  sig11...sig66. 
+
+%  \ttitemn{2016-Jun-15 } version 5.02.10, r5909 \\ 
+%    secondary method to cross-check fractional part of the tunes 
+  
+%  \ttitemn{2016-Jun-10} version 5.02.10, r5905 \\
+%    F. Schmidt's Space-Charge update 
+
+%  \ttitemn{2016-Jun-06} version 5.02.10, r5894 \\
+%    new PTC and PTC tests update.
+ 
+%  \ttitemn{2016-Apr-25} version 5.02.10, r5845 \\
+%    minor improvement of the build system
+  
+%  \ttitemn{2016-Apr-25} version 5.02.10, r5844  \\
+%    correction of a logic error in max\_mult\_ord settings in c6t. 
+
+  \ttitemn{2016-Apr-22} version 5.02.10, r5833\\
+  the function \hyperref[subsubsec:table]{TABINDEX} has been introduced and the section has been reschuffled.
+
+%  \ttitemn{2016-Apr-19} version 5.02.10, r5816, r5817\\
+%  the intialization of modules twiss, track, emit, touschek, dynap, plot, ibs has been reviewed with the introduction of the new fix point search for proper beam initialization. This affected the physics in the presence of RF with HARMON attributes or changes in deltap.
+
+  \ttitemn{2016-Apr-19} version 5.02.10, r5816\\
+  the defaults for \hyperref[sec:beam]{\texttt{BEAM}} attributes \texttt{ET, SIGT, SIGE} have been set to the values $10^{-3}, 1, 10^{-3}$ respectively (were $1, 0, 0$).
+
+  \ttitemn{2016-Apr-07} version 5.02.10, r5810\\
+  the attribute \hyperref[chap:twiss]{SECTORACC} has been added to the twiss command for sectormap computation.
+
+  \ttitemn{2016-Feb-14} version 5.02.08, r5673\\
+  fixed a bug in \hyperref[chap:emit]{\texttt{EMIT}} whereby the
+  coordinates of the orbit were mixed up (through Fortran equivalence
+  statements) between the vertical and longitudinal plane, leading to
+  wrong results in damping partition numbers and emittances. In all tests
+  in our test-suite the difference turned out to be very small but other
+  users might experience otherwise.
+
+  \ttitemn{2015-Nov-03} version 5.02.07, r5484\\
+  the \hyperref[subsec:keyword]{keyword \texttt{VERSION}} has been introduced.
+  
+  \ttitemn{2015-Sep-15} version 5.02.07, r5407\\
+  Removed the precedence information in the \hyperref[sec:beam]{\texttt{BEAM}} 
+  command between the longitudinal emittance (\texttt{ET}) and beams sizes 
+  (\texttt{SIGT} and \texttt{SIGE}) since this is actually not implemented in the 
+  code.
+  
+  \ttitemn{2015-Sep-15} version 5.02.07, r5399\\
+  A new option \texttt{NOEXPR} has been added to the
+  \hyperref[sec:save]{\texttt{SAVE}} command to allow saving sequences
+  with only values and no expressions in variables and commands.
+  
+  \ttitemn{2015-Sep-04} version 5.02.07, r5380\\
+  Change of the trailing message printed on output that no longer 
+  mentions the version number and version architecture. 
+  The same information can already be found in the header message.
+
+  \ttitemn{2015-Aug-31} version 5.02.07, r5367\\
+  \texttt{TEAPOT} is now the default style for 
+  \hyperref[chap:makethin]{\texttt{MAKETHIN}}. 
+  The previous default style that was used when the \texttt{STYLE} 
+  attribute was not specified in the \texttt{MAKETHIN} command 
+  has been given the name \texttt{HYBRID} 
+  and can still be used with the explicit \texttt{STYLE=hybrid} attribute. \\
+  \textbf{All \texttt{MAKETHIN} commands where \texttt{STYLE} is not specified now
+  use the \texttt{TEAPOT} style instead of the previously unnamed \texttt{HYBRID} 
+  style}
+
+  \ttitemn{2015-Jul-15} version 5.02.06, r5336 \\
+  corrected a typo in equation \ref{eq:field-components} 
+  reported by Michael Severance (Stony Brook). 
+  The $B_2$ factor of the expansion of the $B_x$ 
+  field was reading $(xy - \frac{h^3}{6}y^3+\cdots)$ 
+  and has been corrected to $(xy - \frac{h}{6}y^3+\cdots)$.
+
+  \ttitemn{2015-Jun-09} version 5.02.06, r5250\\
+  added a guard against negative sequence length and negative 
+  element lengths at the time of sequence expansion triggered 
+  by a \hyperref[sec:use]{\texttt{USE}} command, with \madx then 
+  finishing with fatal error. No checks were performed so far 
+  on these attributes, assuming that all length were positive.
+
+  \ttitemn{2015-Jun-05} version 5.02.06, r5247\\
+  added the cardinal sine \texttt{SINC(x)} to the list of 
+  \hyperref[subsec:operator]{available operators in arithmetic 
+  expressions}.
+
+  \ttitemn{2015-Mar-31} version 5.02.05, r5181\\
+  added a \hyperref[sec:shrink]{\texttt{SHRINK}} command to remove 
+  rows at the end of an existing table.
+
+  \ttitemn{2015-Mar-11} version 5.02.05, r5162\\
+  \textbf{Major change} to the definition of emittances in the 
+  \hyperref[chap:beam]{\texttt{BEAM}} command. For historical reasons, 
+  there was a factor 4 in the relation between normalised emittance 
+  $\epsilon_n$ and geometric emittance $\epsilon$: 
+  $\epsilon_n = 4 \beta \gamma \ \epsilon$, where $\beta$ and 
+  $\gamma$ are the usual relativistic factors. \\
+  The common definition $\epsilon_n = \beta \gamma \ \epsilon$ 
+  is now used across all \madx modules.
+  
+  The \hyperref[sec:aperture]{\texttt{APERTURE}} command now gets the 
+  geometric emittances from values input or calculated in the 
+  \hyperref[chap:beam]{\texttt{BEAM}} command; the attributes
+  \texttt{EXN} and \texttt{EYN} of the \texttt{APERTURE} command have
+  been removed together with their default value of \texttt{EXN =
+    2.75E-6} and \texttt{EYN = 2.75E-6} corresponding to the standard
+  normalized emittances for LHC beams in collisions. 
+  
+
+  \ttitemn{2015-Mar-10} version 5.02.05, r5161\\
+  \textbf{Major change} to definition of \texttt{RACETRACK} 
+  \hyperref[sec:def-aper]{aperture type}. 
+  The \texttt{RACETRACK} aperture now refers to a generalized shape 
+  with rounding of corner with ellipse instead of circle. 
+  The \texttt{APERTURE} array now takes four arguments for the 
+  \texttt{RACETRACK} shape: maximum horizontal extent, maximum 
+  vertical extent, horizontal semi-axis and vertical semi-axis 
+  of ellipse for rounding the corner. \\
+  \textbf{Note also that the definition of the first two arguments 
+  has changed from horizontal and vertical offsets to horizontal 
+  and vertical maximum extensions.}
+
+  Removed also all references in the code and the manual to the 
+  \texttt{MARGUERITE} aperture type (two \texttt{RECTCIRCLE}s 
+  crossing at right angle) that has been deprecated for some 
+  time already.
+
+%%  \ttitemn{2015-Mar-06} version 5.02.05, r5158\\
+%  \textbf{Major change} to collimator elements: the \texttt{RCOLLIMATOR} 
+%  and \texttt{ECOLLIMATOR} elements are no longer defined in \madx and 
+%  replaced by a generic \hyperref[sec:collimator]{\texttt{COLLIMATOR}} element.\\
+%  \textbf{(give reference to web page giving details for translation...)}
+
+  \ttitemn{2015-Feb-19} version 5.02.05, r5143\\
+  added the \texttt{OCTAGON} in the list of predefined 
+  \hyperref[chap:aperture]{\texttt{APERTURE}} types.
+  
+  \ttitemn{2015-Feb-11} version 5.02.05, r5128\\
+  clarified that the \texttt{NMASS} constant is the unified atomic mass 
+  unit and not the neutron mass. None of the constants have changed in 2014 PDG 
+  publication with respect to the 2012 version \cite{PDG2012}. Updated
+  the reference to PDG publications to include 2014 version \cite{PDG2014}.
+
+  \ttitemn{2015-Jan-28} version 5.02.05, r5118\\
+  clarified in the \hyperref[chap:elements]{definition of magnetic elements} 
+  that the effect of defined magnetic strengths is always the same, 
+  irrespective of the \hyperref[sec:beam]{\texttt{CHARGE}} of the particles declared 
+  in the \hyperref[sec:beam]{\texttt{BEAM}} command. It is agreed in the literature 
+  that a positive quadrupole (positive $K_1$) focuses positive particles in the 
+  horizontal plane and defocuses negative particles in the same horizontal 
+  plane, for the same direction of propagation. \\ 
+  Currently \mad ignores the \hyperref[sec:beam]{\texttt{CHARGE}} attribute and 
+  focuses both positive and negative particles in the horizontal plane when 
+  going through a quadrupole with positive $K_1$. \\
+  \textbf{THIS MAY CHANGE IN THE FUTURE TO CONFORM TO EXISTING CONVENTIONS}\\
+  Electrostatic elements (\hyperref[sec:elseparator]{\texttt{ELSEPARATOR}}, 
+  \hyperref[sec:rfcavity]{\texttt{RFCAVITY}},
+  \hyperref[sec:crabcavity]{\texttt{CRABCAVITY}}, and the RF part of the
+  \hyperref[sec:rfmultipole]{\texttt{RFMULTIPOLE}}) handle the
+  \hyperref[sec:beam]{\texttt{CHARGE}} attribute appropriately and provide 
+  opposite effects for opposite charges travelling in the same direction. 
+
+
+  \ttitemn{2014-Dec-19} version 5.02.05, r5111\\
+  added the Gauss error function \texttt{ERF} and the complementary error function 
+  \texttt{ERFC} to the list of \hyperref[subsec:operator]{available operators in 
+  arithmetic expressions}. Added documentation in the same section for the 
+  \texttt{FLOOR}, \texttt{CEIL} and \texttt{ROUND} functions that were already 
+  implemented. 
+  
+  
+  \ttitemn{2014-Dec-10} version 5.02.04, r5093 and r5101\\
+  clarified the global coordinate system figure~\ref{F-GLOB} with colors and 
+  representations of projections of planes onto the horizontal Cartesian 
+  plane as well as intersections of local coordinate planes with horizontal 
+  Cartesian plane. 
+  
+  
+  \ttitemn{2014-Nov-25} version 5.02.04, r5092\\
+  removed the \hyperref[sec:global]{\texttt{GLOBAL}} matching constraints
+  \texttt{DDQ1, DDQ2} from the documentation since they are not
+  implemented in the code.  
+  
+  
+  \ttitemn{2014-Nov-14} version 5.02.04, r5081\\
+  added a \hyperref[sec:copyfile]{\texttt{COPYFILE}} command. Changed the attribute 
+  name for the destination for the \hyperref[sec:renamefile]{\texttt{RENAMEFILE}} 
+  command from \texttt{NAME} to \texttt{TO}.
+  
+  
+  \ttitemn{2014-Nov-13} version 5.02.04, r5078\\
+  fixed figure \ref{F-YSDISP} where the \textit{x}-axis was pointing in
+  the wrong direction and the orientation of the element for positive
+  \texttt{DPHI} was also not conforming to the text for the
+  \hyperref[sec:ealign]{\texttt{EALIGN}} command.
+  
+  
+  \ttitemn{2014-Nov-13}  version 5.02.04, r5080\\
+  documented a bug occurring when \hyperref[sec:beamline]{\texttt{LINE}}
+  or \hyperref[sec:macro]{\texttt{MACRO}} constructs appear within a
+  \hyperref[sec:if]{\texttt{IF ... ELSEIF ... ELSE}} or a 
+  \hyperref[sec:while]{\texttt{WHILE}} construct. This bug will not be
+  fixed now. \\  
+  Clarified also that \texttt{IF ... ELSEIF ... ELSE} and \texttt{WHILE}
+  constructs can be nested to at least six levels deep.
+  
+  
+  \ttitemn{2014-Oct-14} version 5.02.03, r5013\\
+  fixed a documented feature of \hyperref[chap:survey]{\texttt{SURVEY}}
+  where the first \texttt{KSL} component of thin
+  \hyperref[sec:multipole]{\texttt{MULTIPOLE}} elements, representing a
+  vertical angle for a thin dipole, was not taken into account. Both
+  \texttt{KNL} and \texttt{KSL} are now properly taken into
+  account. Another change was to make \texttt{SURVEY} take into account
+  the \hyperref[sec:rfmultipole]{\texttt{RFMULTIPOLE}} elements in the
+  same way that it treats \texttt{MULTIPOLE} elements.
+  
+  
+  \ttitemn{2014-Aug-27} version 5.02.03, r4947 \\
+  changed the behaviour of \hyperref[sec:fill]{\texttt{FILL}} to accept as
+  parameter a row number equal to the current number of rows in the
+  table plus one, with the effect of creating a new row and filling it. 
+  
+  
+  \ttitemn{2014-Aug-25} version 5.02.03, r4942 and r4943\\
+  harmonized the behaviour of \hyperref[sec:fill]{\texttt{FILL}},
+  \hyperref[sec:setvars]{\texttt{SETVARS}} and
+  \hyperref[sec:setvars-lin]{\texttt{SETVARS\_LIN}} with respect to
+  negative row numbers, and updated the default values. Added
+  documentation sections for \texttt{SETVARS} and \texttt{SETVARS\_LIN}
+  that were hitherto undocumented.   
+  
+  
+  \ttitemn{2014-Aug-18} version 5.02.03, r4932 \\
+  a single element can now be repeated in a beamline expansion:
+  \texttt{2*S} and \texttt{-2*S} are of course identical (single
+  elements are not reversed head to tail), and also equivalent to
+  \texttt{2*(S)} and \texttt{-2*(S)} if \texttt{S} is a single
+  element.\\
+  Documentation updated; see \ref{sec:reflect-repeat-lines}
+
+
+\end{madlist}
+  
+
+
+\newpage
+
+%% EOF

@@ -1,0 +1,956 @@
+%%\title{Matching Module}
+%  Changed by: Chris ISELIN, 27-Jan-1997 
+%  Changed by: Oliver Bruning, 20-Jun-2002 
+%  Changed by: Hans Grote, 30-Sep-2002 
+ 
+\chapter{Matching Module}
+\label{chap:match}
+
+Before a match operation at least one sequence must be selected by means
+of a \hyperref[sec:use]{\texttt{USE}} command. Matching is 
+initiated by the \hyperref[sec:match]{\texttt{MATCH}} command. The matching
+module can act on more than one sequence simultaneously by  specifying
+more than one sequence when initiating the matching mode.  
+From this command to the corresponding
+\hyperref[sec:endmatch]{\texttt{ENDMATCH}} command \madx accepts the
+matching commands listed below. For a mathematical description of the
+minimisation procedures see \cite{MINUIT}. 
+
+In particular one may do the following: 
+\begin{itemize}
+ \item Define the sequence(s) the matching module will work on 
+ \item Set initial conditions for transfer line matching 
+ \item Define constraints 
+ \item Define the parameters to be varied 
+ \item Match by different methods. 
+\end{itemize}
+
+The matching commands are described in detail below. Some other commands
+can also be issued during matching.  
+
+\begin{itemize}
+\item Enter and Leave Matching Mode
+  \begin{itemize}
+  \item \hyperref[sec:match]{\texttt{MATCH}}: Initiate Matching Mode
+  \item \hyperref[sec:endmatch]{\texttt{ENDMATCH}}: Leave Matching Mode
+  \end{itemize}
+\item Define Variable Parameter
+  \begin{itemize}
+  \item \hyperref[sec:vary]{\texttt{VARY}}: Set Parameter to Vary
+  \end{itemize}
+\item Define Constraint
+  \begin{itemize}
+  \item \hyperref[sec:constraint]{\texttt{CONSTRAINT}}: Simple Constraint 
+  \item \hyperref[sec:userconstraint]{\texttt{CONSTRAINT}}: User Defined Variables 
+  \item \hyperref[sec:weight]{\texttt{WEIGHT}}: Matching Weights
+  \item \hyperref[sec:global]{\texttt{GLOBAL}}: Global Constraints
+  \item \hyperref[sec:gweight]{\texttt{GWEIGHT}}: Weights for Global Constraints
+  \end{itemize}
+\item \hyperref[sec:match-methods]{Matching Methods}
+  \begin{itemize}
+  \item \hyperref[subsec:match-lmdif]{\texttt{LMDIF}}: Fast Gradient Minimisation
+  \item \hyperref[subsec:match-migrad]{\texttt{MIGRAD}}: Gradient Minimisation
+  \item \hyperref[subsec:match-simplex]{\texttt{SIMPLEX}}: Simplex Minimisation
+  \item \hyperref[subsec:match-jacobian]{\texttt{JACOBIAN}}: Newton Minimisation
+  \end{itemize}
+\item Expression Matching with \hyperref[sec:use-macro]{\texttt{USE\_MACRO}}
+\end{itemize}
+
+%\line(1,0){300}
+
+%\href{http://bruening.home.cern.ch/bruening/}{Oliver Br\"uning}, June, 2002; 
+%\href{http://rdemaria.home.cern.ch/rdemaria/}{Riccardo de Maria}, February, 2006. 
+
+% add other files to the end of this file
+
+
+%\input{match/match_main}
+%%\title{MATCH / ENDMATCH}
+%  Changed by: Chris ISELIN, 27-Jan-1997 
+%  Changed by: Oliver Bruning, 20-Jun-2002 
+%  Changed by: Hans Grote, 30-Sep-2002 
+%  Changed by: Riccardo de Maria, 9-Jan-2008 
+
+
+%% Before matching at least one
+%% \href{../Introduction/sequence.html}{SEQUENCE} must be selected by means
+%% of a \href{../control/general.html#use}{USE} command. The matching
+%% module can act on more than one sequence simultaneously by specifying
+%% more than one sequence in the \texttt{MATCH} command.
+
+
+\section{MATCH \ldots ENDMATCH}
+\label{sec:match}\label{sec:endmatch}
+
+The \texttt{MATCH} command is used for matching either a \hyperref[sec:cell]{periodic cell}
+or an \hyperref[sec:insertion]{insertion} to another part of the machine. 
+
+Both matching modes are initiated by the \texttt{MATCH} command using
+one of several forms outlined below. 
+
+The \texttt{ENDMATCH} command terminates the matching section and deletes
+all tables related to the matching run. 
+\madbox{
+ENDMATCH;
+}
+
+
+\section{Cell Matching}
+\label{sec:cell}
+
+The matching of a periodic cell is initiated by a \texttt{MATCH} command of
+the form:
+
+\madbox{
+MATCH, \=SEQUENCE='name1', 'name2', \ldots , 'name-n', \\
+       \>SLOW=logical;
+}
+
+In this first mode the matching routine is initiated only with one
+attribute specifying the sequence(s) the matching module will work
+on. In this matching mode the periodicity of the optics functions is
+enforced at the beginning and end of the selected range. 
+\madxmp{MATCH, SEQUENCE='name1', 'name2', \ldots ,'name-n';}
+    
+
+
+\section{Insertion Matching}
+\label{sec:insertion}
+The matching of an insertion to another part of the machine is initiated
+by a \texttt{MATCH} command taking one of the following forms:
+
+\madbox{
+MATCH, \=SEQUENCE= 'name1', 'name2', \ldots , 'name-n',\\
+       \>BETA0= 'beta01', 'beta02', \ldots , 'beta0n', \\
+       \>SLOW=logical;
+}
+
+or
+
+\madbox{
+MATCH, \=SEQUENCE='seqname', \\ 
+       \>BETX=real, ALFX=real, MUX=real, \\
+       \>BETY=real, ALFY=real, MUY=real, \\
+       \>X=real, PX=real, Y=real, PY=real, \\
+       \>DX=real, DY=real, DPX=real, DPY=real, \\
+       \>DELTAP=real, SLOW=logical;
+}
+
+In the second mode, called insertion matching, the matching routine is
+initiated with two attributes: one specifying the sequence(s) the
+matching module will work on and one specifying the initial conditions
+of the optic functions for each sequence. In this case the initial
+values are assumed as exact. 
+    
+\textbf{Specification of Initial Values:}
+The initial values of the optical
+functions  for the insertion matching can either be specified in form of
+a \hyperref[sec:savebeta]{\texttt{SAVEBETA}} command or by
+explicitly stating the individual optic function values after the
+\texttt{MATCH} command. The two options can be entered as         
+\madxmp{
+  MATCH, \=SEQUENCE= 'name1', 'name2',.., 'name-n',\\
+         \>BETA0= 'beta01', 'beta02',..., 'beta0n';
+}
+or
+\madxmp{
+  MATCH, \=SEQUENCE='seqname', \\ 
+         \>BETX=real, ALFX=real, MUX=real, \\
+         \>BETY=real, ALFY=real, MUY=real, \\
+         \>X=real, PX=real, Y=real, PY=real, \\
+         \>DX=real, DY=real, DPX=real, DPY=real, \\
+         \>DELTAP=real;
+}
+
+\textbf{Example 1:}   
+\begin{verbatim}
+CELL: SEQUENCE=(...) ;
+INSERT: SEQUENCE=(...) ;
+USE, PERIOD=cell;
+SAVEBETA, LABEL=bini, PLACE=#e;
+TWISS, SEQUENCE=cell;
+USE, PERIOD=insert;
+MATCH, SEQUENCE=insert, BETA0=bini;
+CONSTRAINT, SEQUENCE=insert, RANGE=#e, MUX=9.345, MUY=9.876;
+\end{verbatim}
+
+This matches the sequence 'INSERT' with initial conditions to a new
+phase advance. The initial conditions are given by the periodic solution
+for the sequence CELL1. 
+    
+\textbf{Example 2:}	
+\begin{verbatim}
+USE, PERIOD=insert;
+MATCH, SEQUENCE=insert;
+CONSTRAINT, SEQUENCE=insert, RANGE=#e, MUX=9.345, MUY=9.876;
+\end{verbatim}
+This matches the beam line 'INSERT' with periodic boundary conditions to
+a new phase advance. 
+
+The initial conditions can also be transmitted by a combination of a
+\hyperref[sec:savebeta]{\texttt{SAVEBETA}} command and explicit
+optic function specifications: 
+\begin{verbatim}
+USE, cell1;
+SAVEBETA, LABEL=bini, PLACE=#E;
+TWISS, SEQUENCE=cell1;
+USE, PERIOD=line1;
+MATCH, SEQUENCE=line1, BETA0=bini, MUX=1.234, MUY=4.567;
+\end{verbatim}
+
+This example transmits all values of the \texttt{SAVEBETA} array 'bini' as
+initial values to the \texttt{MATCH} command and overrides the initial phase
+values by the given values.
+
+An additional \hyperref[sec:constraint]{\texttt{CONSTRAINT}} may be
+imposed in other places, i.e. intermediate or end values of the optics
+functions at the transition point.  
+ 
+\section{More than one active sequence}
+
+The matching module can act on more than one sequence simultaneously by
+specifying more than one sequence after the \texttt{MATCH} command: 
+\madxmp{
+MATCH, SEQUENCE=line1, CELL1, BETA0=bini1, bini2;
+}
+This example initiates the matching mode for the 'LINE1' and the 'CELL1'
+sequence. The \hyperref[chap:twiss]{Twiss} functions of the
+two sequences are calculated with fixed initial conditions. 
+
+The \texttt{SAVEBETA} array 'bini1' is used for calculating the optics
+functions of sequence 'LINE1' and the \texttt{SAVEBETA} array 'bini2'
+for calculating the optics functions of sequence 'CELL1'. Without the
+initial conditions the matching module will work in the
+\hyperref[sec:cell]{\texttt{CELL}} mode. 
+ 
+\section{SLOW attribute}
+
+The \texttt{SLOW} logical flag enforces the old and slow matching procedure
+which allows to use the special columns \texttt{mvar1, ..., mvar4}, if they
+are added to the twiss table.
+
+Recently a number of parameter, like \texttt{RE56}, have been added to the
+list of parameters that can be matched. 
+
+Nevertheless, some parameters might only be available when using the
+\texttt{SLOW} attribute.
+ 
+\section{Useful TWISS attributes}
+
+Some of the attributes of the \hyperref[chap:twiss]{\texttt{TWISS}} command
+can be used in the \texttt{MATCH} command and are transmitted to the
+\texttt{TWISS} command when it is internally invoked during the matching process. 
+
+The main \texttt{TWISS} attributes that can be used also in the \texttt{MATCH}
+command are:
+
+\begin{madlist}
+  \ttitem{RMATRIX} If this flag is used the one-turn map at the location of every
+  element is calculated and prepared for storage in the TWISS table.
+ 
+  Target values for the matrix elements at certain positions in the
+  sequence can be specified with the help of the
+  \hyperref[sec:constraint]{\texttt{CONSTRAINT}} command and the keywords:\\
+  \textbf{RE, RE11...RE16...RE61...RE66}, where \textbf{REij} refers to
+  the "ij" matrix component.
+  
+
+  \ttitem{CHROM} This logical flag sets the matching process to transmit
+  the \texttt{CHROM} attribute to the \hyperref[chap:twiss]{\texttt{TWISS}}
+  command when it is invoked, enforcing the calculation of chromatic
+  functions and synchrotron radiation integrals, and the alternative
+  calculation of chromaticities as documented in
+  \hyperref[chap:twiss]{\texttt{TWISS}}.
+
+  If this flag is used the chromatic functions at the location of
+  every element are calculated and prepared for storage in the TWISS
+  table. 
+  
+  Target values for the chromatic functions at certain positions in the
+  sequence can be specified with the help of the
+  \hyperref[sec:constraint]{\texttt{CONSTRAINT}} command and the
+  repective keywords 
+  \hyperref[subsec:tables-chrom]{\texttt{WX, PHIX, WY, PHIY,...}} for
+  the chromatic functions. 
+\end{madlist}
+
+
+\textbf{Examples:}
+
+\begin{verbatim}
+MATCH, RMATRIX, SEQUENCE='name', BETA0='beta-block-name';
+CONSTRAINT, SEQUENCE=insert, RANGE=#e, RE11=-2.808, RE22=2.748;
+VARY, NAME=kqf, STEP=1.0e-6;
+VARY, NAME=kqd, STEP=1.0e-6;
+\end{verbatim}
+
+This matches the sequence 'name' with initial conditions to new values
+for the matrix elements \texttt{RE11} and \texttt{RE22} by varying the
+strength of the main quadrupole circuits.
+
+
+%\href{http://bruening.home.cern.ch/bruening/}{Oliver Br\"uning}, October, 2003;
+%\href{http://rdemaria.home.cern.ch/rdemaria/}{Riccardo de Maria}, January, 2008.
+
+
+%\input{match/match_vary}
+%%\title{the mad program}
+%  Changed by: Chris ISELIN, 27-Jan-1997 
+%  Changed by: Oliver Bruning, 19-Jun-2002 
+ 
+\section{VARY}
+\label{sec:vary}
+A parameter to be varied is specified by the command 
+
+\madbox{
+VARY, \=NAME=variable, STEP=real, LOWER=real, UPPER=real \\
+      \>SLOPE=integer, OPT=real;
+}
+
+It has six attributes: 
+\begin{madlist}
+  \ttitem{NAME} The name of the parameter or attribute to be varied,  
+
+  \ttitem{STEP} The approximate initial step size for varying the
+  parameter. If the step is not entered, \madx tries to find a
+  reasonable step, but this may not always work.  
+
+  \ttitem{LOWER} Lower limit for the parameter (optional), 
+  \ttitem{UPPER} Upper limit for the parameter (optional). 
+
+  \ttitem{SLOPE} allowed change rate (optional, available only using
+  \hyperref[subsec:match-jacobian]{JACOBIAN} routine). Limit the
+  parameter to increase (\texttt{SLOPE=1}) or decrease (\texttt{SLOPE=-1}) only.
+
+  \ttitem{OPT} optimal value for the parameter (optional, available
+  only using \hyperref[subsec:match-jacobian]{JACOBIAN} routine).  
+\end{madlist}
+
+\textbf{Examples:}
+\madxmp{
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\= \kill
+VARY, NAME=PAR1, STEP=1.0E-4;          \>! vary global parameter PAR1 \\
+VARY, NAME=QL11->K1, STEP=1.0E-6;      \>! vary attribute K1 of the QL11 \\ 
+VARY, NAME=Q15->K1, STEP=0.0001, LOWER=0.0, UPPER=0.08; ! vary with limits
+}
+
+If the upper limit is smaller than the lower limit, the two limits are
+interchanged. If the current value is outside the range defined by the
+limits, it is brought back to range. 
+
+If a parameter comes outside the
+limits during the matching process the matching module resets the
+parameter to a value inside the limits and informs the user with a
+message. If such a 'rescaling' occurs more than 20 times the matching
+process terminates. The user should either eliminate the corresponding
+parameters from the list of varied parameters or change the
+corresponding upper and lower limits before restarting the matching
+process. 
+
+After a matching operation all varied attributes retain their
+value after the last successful matching iteration. Using
+\hyperref[subsec:match-jacobian]{JACOBIAN} routine, \texttt{STRATEGY=3}, in case
+the number of parameters is greater than the number of constraint, if a
+parameter comes outside the limits, it is excluded automatically from
+the set of variables and a new solution is searched.  
+
+%\href{http://bruening.home.cern.ch/bruening/}{Oliver Br\"uning}, June, 2002. 
+%\href{http://rdemaria.home.cern.ch/rdemaria/}{Riccardo de Maria}, February, 2006.
+
+
+
+%\input{match/match_con}
+%%\title{Matching Constraints}
+%  Changed by: Chris ISELIN, 27-Jan-1997 
+%  Changed by: Oliver Bruning, 20-Jun-2002 
+%  Changed by: Hans Grote, 25-Sep-2002 
+% Changed by: Ghislain Roy, 11 Dec 2013: removed duplicate paragraph in user defined matching constraint 
+
+\section{CONSTRAINT}
+\label{sec:constraint}
+
+Simple constraints are imposed by the \texttt{CONSTRAINT} command. 
+The \texttt{CONSTRAINT} command has three attributes:   
+\begin{itemize}
+ \item  the \texttt{SEQUENCE} entry specifies the sequence for which the
+   constraint applies.  
+ \item  the RANGE entry specifies the position where the
+   constraint must be satisfied. The \texttt{RANGE} can either be the name
+   of a single element in the sequence or a range between two
+   elements. In the later case the two element names must be
+   separated by a '/': \texttt{RANGE=name1/name2}  
+ \item the optics functions to be constrained. 
+\end{itemize} 
+
+The optic functions can be constrained in four different ways: 
+\begin{enumerate}
+ \item lower limit: \texttt{BETX $>$ value}
+ \item upper limit: \texttt{BETX $<$ value}
+ \item lower and upper limits: \texttt{BETX $<$ value1, 
+   BETX $>$ value2} 
+ \item target value: \texttt{BETX=value}
+\end{enumerate} 
+
+In case one element is affected by more than one constraint command the
+last CONSTRAINT will be chosen. For example, one can specify the
+maximum acceptable beta function over a range of the sequence and
+specify the target beta function for one element that lies inside this
+range. In this case one must first specify the constraint that affects
+the whole range and then the constraint for the single element. This way
+the constraint of the target value overrides the previous constraint on
+the upper limit for the selected element. 
+
+For example, the following
+constraint statements limit the maximum horizontal beta function between
+'marker1' and 'marker2' to 200 meter and require a horizontal beta
+function of 100 meter at element 'name1':  
+\madxmp{
+CONSTRAINT, SEQUENCE=seqname, RANGE='marker1'/'marker2', BETX<200.0;\\
+CONSTRAINT, SEQUENCE=seqname, RANGE='name1'/'marker2', BETX=100.0;
+}
+
+When the two constraint statements are interchanged, and supposing that
+name1 is an element in the range marker1/marker2, the horizontal beta 
+function at element 'name1' will only be limited to less than 200 meter
+and NOT constrained to 100 meter! 
+
+The CONSTRAINTS can either be specified with explicit values for the
+constraints of the optic functions or via a pre-calculated
+\hyperref[sec:savebeta]{\texttt{SAVEBETA}} module. The first
+options has the form: 
+\madbox{
+CONSTRAINT, \=SEQUENCE=seqname, RANGE=position,\\
+            \>BETX=real, ALFX=real, MUX=real, \\
+            \>BETY=real, ALFY=real, MUY=real, \\
+            \>X=real, PX=real, Y=real, PY=real, \\
+            \>DX=real, DY=real, DPX=real, DPY=real;
+}
+
+Here all \hyperref[subsec:tables-linear]{linear lattice functions} 
+(BETX, BETY, ALFX, ALFY, MUX, MUY, DX, DY, DPX, DPY)
+or \hyperref[subsec:tables-chrom]{chromatic lattice functions}
+(WX, XY, PHIX, PHIY, DMUX, DUMY, DDX, DDY, DDPX, DDPY)
+are constrained at the selected range to the corresponding values.
+
+The second form of the CONSTRAINT command has the form
+\madbox{
+CONSTRAINT, \=SEQUENCE=seqname, RANGE=position, \\
+            \>BETA0=beta0-name, MUX=real, MUY=real;
+}
+
+Here all of (\texttt{BETX, BETY, ALFX, ALFY, MUX, MUY, DX, DY, DPX, DPY})
+are constrained in the selected points to the corresponding values
+of a pre-calculated \hyperref[sec:savebeta]{\texttt{SAVEBETA}} module.
+In the above example the phases (\texttt{MUX, MUY}) are overridden by the 
+numerical values specified via \texttt{MUX=real} and \texttt{MUY=real}.
+Normally \hyperref[sec:range]{\texttt{RANGE}} refers to a single position.
+
+\section{User Defined Matching Constraints}
+\label{sec:userconstraint}
+
+In addition to the nominal \hyperref[chap:twiss]{\texttt{TWISS}} variables, 
+the user can define a limited set of 'user-defined' variables in the
+constraint statement.
+This allows, for example, the matching of the normalized dispersion or the
+mechanical aperture. The \texttt{MATCH} module allows four user defined
+variables called: \texttt{MVAR1, MVAR2, MVAR3} and \texttt{MVAR4}. 
+The variables can be defined according to the general variable
+declaration rules of \hyperref[sec:defer]{deferred expressions}.
+For example, in order to match the normalized dispersion at a certain
+location in the sequence one would first define a variable:
+
+\madxmp{
+MVAR1 := table(twiss,dx)/sqrt(table(twiss,betx));
+}
+
+After that the user has to select the variable for output in the TWISS
+statement (see details in the \hyperref[chap:twiss]{TWISS module} and 
+\hyperref[sec:select]{SELECT} statement):
+\madxmp{
+SELECT, FLAG=twiss, CLEAR; \\
+SELECT, FLAG=twiss, COLUMN=keyword, name, s, betx, dx, mvar1; \\
+TWISS, SEQUENCE=seqname, FILE=twissfile;
+}
+
+The variable can now be referenced like any other \texttt{TWISS} variable
+in the constraint command:
+\madxmp{
+CONSTRAINT, SEQUENCE=seqname, RANGE=range, MVAR1=targetvalue;
+}
+
+\section{GLOBAL}
+\label{sec:global}
+
+In addition to conventional matching constraints that specify the optics 
+functions at a certain position in the sequence the user can also constrain 
+global optics parameters such as, for example, the overall machine tune
+and the machine chromaticity. Such global optics parameters can be
+constraint via the \texttt{GLOBAL} command, having the following syntax:
+
+\madbox{
+GLOBAL, \=SEQUENCE=seqname, \\
+        \>Q1=real, DQ1=real, \\ %, DDQ1=real, \\
+        \>Q2=real, DQ2=real;    %, DDQ2=real, \\
+%       \>DQ1DE1=real, DQ2DE2=real, DQ1DE2=real, \\
+%       \>GAMMATR=real, ALFA=real;
+}
+
+
+All attributes are optional and have the following meaning:
+\begin{madlist}
+  \ttitem{SEQUENCE} the name of the sequence on which to operate the matching.
+  \ttitem{Q1, Q2} enable a correction of tunes in presence of
+  magnetic imperfections or misalignments
+  \ttitem{DQ1, DQ2}
+  enable a correction of chromaticities in presence of
+  magnetic imperfections or misalignments
+%  \ttitem {DDQ1, DDQ2} enable a correction of nonlinear chromaticities
+%  \ttitem {DQ1DE1, DQ2DE2, DQ1DE2} enable a correction of anharmonicities,   
+% \textsl{ie} the detuning with amplitudes
+%  \ttitem {GAMMATR} enable a correction of the transition energy of the lattice
+%  \ttitem {ALFA} enable a correction of the momentum compaction factor of the  
+%lattice.
+\end{madlist}
+
+
+\section{WEIGHT, GWEIGHT}
+\label{sec:weight}\label{sec:gweight}
+
+The matching procedures try to fulfil the constraints
+in a least square sense.
+A penalty function is constructed which is the sum of the
+squares of all errors, each multiplied by the specified weight.
+The larger the weight, the more important a constraint becomes.
+The weights are taken from a table of current values.
+These are initially set to default values listed in the table below,
+and may be reset at any time to different values.
+Values set in this way remain valid until changed again.
+
+The \texttt{WEIGHT} command changes the weights for subsequent
+constraints: 
+\madbox{
+WEIGHT, \=BETX=real, ALFX=real, MUX=real, \\
+        \>BETY=real, ALFY=real, MUY=real, \\
+        \>X=real, PX=real, Y=real, PY=real, \\
+        \>DX=real, DPX=real, DY=real, DPY=real;
+}
+
+The weights are entered with the same name as the
+\hyperref[subsec:tables-linear]{linear lattice functions} and
+\hyperref[subsec:tables-canon]{orbit coordinate} 
+to which the weight applies.
+Frequently the matching weights serve to select a restricted
+set of functions to be matched.
+
+Matching weights for global matching constraints can be set by the 
+\texttt{GWEIGHT} command, having attributes identical to those of
+\texttt{GLOBAL}.
+
+\madbox{
+GWEIGHT, \=Q1=real, DQ1=real, \\ %DDQ1=real, \\
+         \>Q2=real, DQ2=real;  % DDQ2=real, \\
+%        \>DQ1DE1=real, DQ2DE2=real, DQ1DE2=real, \\
+%        \>GAMMATR=real, ALFA=real;
+}
+
+
+Default values for matching weights are given in the table below.
+
+\begin{table}[ht]
+  \centering
+  \caption{Default Matching Weights}
+  \vspace{1ex}
+  \begin{tabular}{|lr|lr|lr|}
+    \hline
+    NAME   & WEIGHT & NAME   & WEIGHT & NAME   & WEIGHT \\
+    \hline
+    BETX   &   1.0  & ALFX   &  10.0  & MUX    &  10.0  \\
+    BETY   &   1.0  & ALFY   &  10.0  & MUY    &  10.0  \\ 
+    X      &  10.0  & PX     & 100.0  &  & \\
+    Y      &  10.0  & PY     & 100.0  &  & \\
+    T      &  10.0  & PT     & 100.0  &  & \\ 
+    DX     &  10.0  & DPX    & 100.0  &  & \\
+    DY     &  10.0  & DPY    & 100.0  &  & \\ 
+    WX     &   1.0  & PHIX   &   1.0  & DMUX   &   1.0  \\
+    WY     &   1.0  & PHIY   &   1.0  & DMUY   &   1.0  \\ 
+    DDX    &   1.0  & DDPX   &   1.0  &  & \\
+    DDY    &   1.0  & DDPY   &   1.0  &  & \\ 
+    MVAR\textit{i}  &  10.0  & & & & \\
+    Q1     &  10.0  & DQ1    &   1.0  &  & \\ %& DDQ1    &  0.1  \\
+    Q2     &  10.0  & DQ2    &   1.0  &  & \\ %& DDQ2    &  0.1  \\
+    %      DQ1DE1 &    ??  & DQ2DE2 &    ??  & DQ1DE2  &   ??  \\
+    %      GAMMATR&    ??  & ALFA   &    ??  &  & \\
+    \hline
+    %% name   & weight & name   & weight & name   & weight & name   & weight & name   & weight & name   & weight \\ 
+    %% BETX   &   1.0  & ALFX   &  10.0  & MUX    &  10.0  & BETY   &   1.0  & ALFY   &  10.0  & MUY    &  10.0  \\ 
+    %% X      &  10.0  & PX     & 100.0  & Y      &  10.0  & PY     & 100.0  & T      &   0.0  & PT     &   0.0  \\ 
+    %% DX     &  10.0  & DPX    & 100.0  & DY     &  10.0  & DPY    & 100.0  & - \\ 
+    %% WX     &  10.0  & PHIX   &  10.0  & DMUX   & 100.0  & WY     &  10.0  & PHIY   &  10.0  & DMUY   & 100.0  \\ 
+    %% DDX    &  10.0  & DDPX   & 100.0  & DDY    &  10.0  & DDPY   & 100.0  & - \\ 
+    %% MVAR1    & 10.0  & MVAR2    & 10.0  & MVAR3    & 10.0  & MVAR4    & 10.0  & -
+  \end{tabular}
+\end{table}
+
+
+
+%\href{http://bruening.home.cern.ch/bruening/}{Oliver Br\"uning}, June, 2002
+
+
+%\input{match/match_xeq}
+%%\title{the mad program}
+%  Changed by: Chris ISELIN, 27-Jan-1997 
+%  Changed by: Oliver Bruning, 20-Jun-2002 
+
+\section{Matching Methods}
+\label{sec:match-methods}
+
+\madx currently supports four different matching algorithms each associated to 
+a command with its own attributes. 
+
+\subsection{LMDIF: Fast Gradient Minimisation}
+\label{subsec:match-lmdif}
+The \texttt{LMDIF} command minimises the sum of squares of the constraint
+functions using their numerical derivatives. It is the fastest
+minimisation method available in \madx.
+ 
+\madbox{
+LMDIF, CALLS=integer, TOLERANCE=real;
+}
+
+The command has two attributes:  
+\begin{madlist}
+   \ttitem{CALLS} The maximum number of calls to the penalty
+   function. (Default:~1000) 
+   \ttitem{TOLERANCE} The desired tolerance for the minimum. 
+   (Default:~1E-6)  
+\end{madlist}
+
+\subsection{MIGRAD: Gradient Minimisation}
+\label{subsec:match-migrad}
+The \texttt{MIGRAD} command minimises the penalty function using the numerical
+derivatives of the sum of squares.  
+
+\madbox{
+MIGRAD, CALLS=integer, TOLERANCE=real, STRATEGY=integer;
+}
+
+The command has three attributes: 
+\begin{madlist}
+   \ttitem{CALLS} the maximum number of calls to the penalty
+   function. (Default:~1000) 
+   \ttitem{TOLERANCE} the desired tolerance for the minimum. 
+   (Default:~1E-6)
+   \ttitem{STRATEGY} specifies the strategy to be used. (Default:~1) \\
+   Details are given in \cite{MINUIT}.  
+\end{madlist} 
+
+\subsection{SIMPLEX: Simplex Minimisation}
+\label{subsec:match-simplex}
+The \texttt{SIMPLEX} command minimises the penalty function by the simplex
+method. Details are given in \cite{MINUIT}.
+
+\madbox{
+SIMPLEX, CALLS=integer, TOLERANCE=real;
+}
+
+The command has two attributes: 
+\begin{madlist}
+   \ttitem{CALLS} The maximum number of calls to the penalty
+   function. (Default:~1000) 
+   \ttitem{TOLERANCE} The desired tolerance for the minimum. 
+   (Default:~1E-6)
+\end{madlist} 
+
+\subsection{JACOBIAN: Newton Minimisation}
+\label{subsec:match-jacobian}
+The \texttt{JACOBIAN} command minimises the penalty function calculating the
+Jacobian and solving the linear problem. A $Q R$ or $L Q$  decomposition is
+performed when the system is over or under-determined. Before starting
+the matching routine two optional transformations (\texttt{COOL} and
+\texttt{RANDOM}) are performed. 
+
+\madbox{
+JACOBIAN, \=CALLS=integer, TOLERANCE=real, REPEAT=integer, \\
+          \>STRATEGY=integer, COOL=real, BALANCE=real, \\
+          \>RANDOM=real;
+}
+
+The command has the folowing attributes: 
+\begin{madlist}
+  \ttitem{CALLS} The maximum number of calls to the penalty
+  function. (Default:~30)  
+
+  \ttitem{TOLERANCE} The desired tolerance for the minimum. 
+  (Default:~1E-6)
+
+  \ttitem{REPEAT} The number of calls of the JACOBIAN routine. 
+  (Default:~1) 
+
+  \ttitem{BISEC} Selects the maximum number of iteration used to
+  determine the step length which reduces the penalty function during
+  the main iteration. A large number (i.e. 6) reduces the probability
+  to diverge from the solution, but increases the probability of being
+  trapped in a local minimum.  
+
+  \ttitem{STRATEGY} A code for the strategy to be used. (Default:~3)\\
+  If STRATEGY=1 the routine resets the values of the variables which
+  exceeds the limits. If STRATEGY=2 the routine print the Jacobian
+  and exit without matching. If STRATEGY=3 the routine  disables the
+  variables which exceeds the limits keeping however the number of
+  variables greater or equal to the number of the constraints.  
+
+  \ttitem{COOL, BALANCE} The factors which specify the following
+  transformation: 
+  \madxmp{
+   xxx\=xxxxxxxxx\= \kill
+   if \>"balance" >=0 \\
+      \>newval = (1-cool)*oldval +  \& \\
+      \>       \>cool*((1-balance)*maxval + balance*minval)\\
+   else \\
+      \>newval = (1-cool)*oldval + cool*optval
+  }
+  where \texttt{newval} is the new value after the transformation,
+  \texttt{oldval} is the previous value, \texttt{maxval, minval,
+    optval} are the maximum, minimum and optimal value of
+   the variable specified in the \texttt{VARY} command. 
+
+   \ttitem{RANDOM} The factors which specify the following transformation:
+   \madxmp{newval = ( 1 + random * rand() ) * oldval}
+   where \texttt{newval} is the new value after the transformation,
+   \texttt{oldval} is the previous value, \texttt{rand()} is a stochastic
+   variable with a uniform (-0.5,0.5) distribution.   
+\end{madlist} 
+
+
+%\href{http://bruening.home.cern.ch/bruening/}{Oliver Br\"uning}, June, 2002. 
+%\href{http://rdemaria.home.cern.ch/rdemaria/}{Riccardo de Maria}, February, 2006. 
+
+
+%\input{match/match_um}
+%%\title{Expression Matching with USE\_MACRO}
+%  Changed by: Chris ISELIN, 27-Jan-1997 
+%  Changed by: Oliver Bruning, 20-Jun-2002 
+%  Changed by: Hans Grote, 30-Sep-2002 
+
+\section{USE\_MACRO}
+\label{sec:use-macro}
+ 
+It is possible to match user defined expressions with the
+\texttt{USE\_MACRO} keyword. 
+
+The general input structure for a \texttt{MATCH} command is the following:
+
+\begin{verbatim}
+MATCH,USE_MACRO;
+... VARY statements ...
+USE_MACRO, NAME=macro1;
+     or
+macro1: MACRO={ ... madx statements};
+CONSTRAINT, expr=  "lhs1 < | = | > rhs1";
+CONSTRAINT, weight=2, expr=  "lhs2 < | = | > rhs2";
+...  CONSTRAINT statements ...
+MACRO 2 definition
+... CONSTRAINT statements ...
+MACRO n definition
+... CONSTRAINT statements ...
+... METHODS statements ...
+ENDMATCH;
+\end{verbatim}
+ 
+The algorithm for evaluating the penalty function is the following:
+ 
+\begin{itemize}
+   \item  execute the first macro,
+   \item  evaluate and compute the difference between the left hand side
+     (lhs) and the right hand side (rhs) of the first set of expressions, 
+   \item in case of other macros, evaluates in order the macro and the
+     expressions 
+   \item  the set of differences are  minimized by the selected method
+     using the variables defined in the VARY statements. 
+\end{itemize}
+
+\subsection{Initiating the Matching Module with \texttt{USE\_MACRO}}
+ 
+With:
+\madxmp{
+MATCH, USE\_MACRO;
+}
+the \texttt{MATCH} command can be used for matching any expression which
+can be defined through expression. It requires a slightly different syntax.
+
+\subsection{VARY statements}
+In the \texttt{USE\_MACRO} mode the \texttt{VARY} statement follows the
+same rules of the other modes explained in the section
+\hyperref[sec:vary]{Define Variable Parameter} 
+
+\subsection{Macro definitions}
+The macro to be used in the matching routine can be defined in two ways:
+ 
+\begin{itemize}
+\item using USE\_MACRO statement:
+  \madxmp{USE\_MACRO, NAME=macro1;}
+  defining a new macro on the fly using the usual syntax for
+  \hyperref[sec:macro]{\texttt{MACRO}}s.  
+\end{itemize}
+ 
+After a macro definition a set of constraints should be defined, with
+the following syntax for the \texttt{CONSTRAINT} command:
+ 
+\madxmp{
+CONSTRAINT, expr = "lhs = rhs"; \\
+CONSTRAINT, expr = "lhs < rhs"; \\
+CONSTRAINT, expr = "lhs > rhs"; 
+}
+
+where "lhs" and "rhs" are well defined \madx expressions. 
+Another set of macro and constraints can be defined afterwards. 
+
+\subsection{Examples}
+The \texttt{USE\_MACRO} mode can emulate a matching script
+which uses the normal syntax. 
+
+Normal syntax:
+\begin{verbatim}
+MATCH,SEQUENCE=LHCB1,LHCB2;
+    VARY, NAME=KSF.B1, STEP=0.00001;
+    VARY, NAME=KSD.B1, STEP=0.00001;
+    VARY, NAME=KSF.B2, STEP=0.00001;
+    VARY, NAME=KSD.B2, STEP=0.00001;
+    GLOBAL,SEQUENCE=LHCB1,DQ1=QPRIME;
+    GLOBAL,SEQUENCE=LHCB1,DQ2=QPRIME;
+    GLOBAL,SEQUENCE=LHCB2,DQ1=QPRIME;
+    GLOBAL,SEQUENCE=LHCB2,DQ2=QPRIME;
+    LMDIF, CALLS=10, TOLERANCE=1.0E-21;
+ENDMATCH;
+\end{verbatim}
+
+USE\_MACRO syntax:
+
+\begin{verbatim}
+MATCH,USE_MACRO;
+    VARY, NAME=KSF.B1, STEP=0.00001;
+    VARY, NAME=KSD.B1, STEP=0.00001;
+    VARY, NAME=KSF.B2, STEP=0.00001;
+    VARY, NAME=KSD.B2, STEP=0.00001;
+    M1: MACRO={ TWISS,SEQUENCE=LHCB1; };
+    CONSTRAINT, EXPR= TABLE(SUMM,DQ1)=QPRIME;
+    CONSTRAINT, EXPR= TABLE(SUMM,DQ2)=QPRIME;
+    M2: MACRO={ TWISS,SEQUENCE=LHCB2; };
+    CONSTRAINT, EXPR= TABLE(SUMM,DQ1)=QPRIME;
+    CONSTRAINT, EXPR= TABLE(SUMM,DQ2)=QPRIME;
+    LMDIF, CALLS=10, TOLERANCE=1.0E-21;
+ENDMATCH;
+\end{verbatim}
+
+%\line(1,0){300}
+
+%\href{http://bruening.home.cern.ch/bruening/}{Oliver Br\"uning},October, 2003;
+%\href{http://rdemaria.home.cern.ch/rdemaria/}{Riccardo de Maria}, February, 2006.
+
+
+%\input{match/match_xmpl}
+%%\title{the mad program}
+%  Changed by: Chris ISELIN, 16-Sep-1997 
+%  Changed by: Oliver Bruning, 27-Jun-2002 
+%  Changed by: Hans Grote, 25-Sep-2002 
+ 
+\section{Matching Examples}
+\label{sec:match-examples}
+
+All matching examples and the related files for executing the \madx
+sample jobs can be found in the examples directory
+(\href{https://github.com/MethodicalAcceleratorDesign/madx-examples}{https://github.com/MethodicalAcceleratorDesign/madx-examples})
+of the \madx website.
+
+\begin{itemize}
+   \item Simple Periodic Cell\\
+     Match a simple cell to given phase advances:
+     \href{https://github.com/MethodicalAcceleratorDesign/madx-examples/blob/master/match/5cell/job.5cell.madx}
+     {FIVE-CELL}
+     
+   \item Simple Periodic Cell\\
+     Match the matrix elements of the linear transfer matrix at the
+     end of a sequence 5 periodic cells:
+     \href{https://github.com/MethodicalAcceleratorDesign/madx-examples/blob/master/match/r-matrix/job.r-matrix.madx}
+     {RMATRIX}
+     
+   \item Transfer line with initial conditions\\
+     Match a sequence of 5 periodic cells with initial conditions  to
+     given beta-functions at the end of the sequence:
+     \href{https://github.com/MethodicalAcceleratorDesign/madx-examples/blob/master/match/line/job.line.madx}
+     {Transfer line}
+     
+   \item Global tune matching in a sequence of 5 periodic cells \\
+     Match the global tune of a sequence of 5 periodic cells:
+     \href{https://github.com/MethodicalAcceleratorDesign/madx-examples/blob/master/match/global-tune/job.global-tune.madx}
+     {Global tune}
+     
+   \item Global tune matching for the LHC\\
+     Match the global tune for beam1 of the LHC:
+     \href{https://github.com/MethodicalAcceleratorDesign/madx-examples/blob/master/match/lhc.tune/job.lhc.tune.madx}
+     {Global tune for the LHC}
+     
+   \item Global chromaticity matching for the LHC\\
+     Match the global chromaticity for beam1 of the LHC:
+     \href{https://github.com/MethodicalAcceleratorDesign/madx-examples/blob/master/match/lhc.chromaticity/job.lhc.chromaticity.madx}
+     {Global chromaticity for the LHC}
+     
+   \item Global chromaticity matching for both beams of the LHC\\
+     Match the global chromaticity for beam1 and beam2 of the LHC:
+     \href{https://github.com/MethodicalAcceleratorDesign/madx-examples/blob/master/match/lhc.2chromaticity/job.lhc.2chromaticity.madx}
+     {Global chromaticity for both beams of the LHC}
+     
+   \item IR8 insertion matching for beam1 of the LHC\\
+     Match the insertion IR8 with initial conditions to given values
+     of the optics  functions at the IP and the end of the insertion:
+     \href{https://github.com/MethodicalAcceleratorDesign/madx-examples/blob/master/match/lhc.insertion/job.lhc.insertion.madx}
+     {IR8 insertion matching} for beam1 of the LHC
+     
+   \item IR8 insertion matching for beam1 of the LHC with upper
+     limits on the optics functions\\
+     Match the insertion IR8 with initial conditions to given values
+     of the optics  functions at the IP and the end of the insertion
+     while limiting the maximum acceptable beta functions over the
+     whole insertion:
+     \href{https://github.com/MethodicalAcceleratorDesign/madx-examples/blob/master/match/lhc.insertion-upper/job.lhc.insertion-upper.madx}
+     {IR8 insertion matching}
+     for beam1 of the LHC with upper limits for
+     all beta functions inside the insertion
+     
+   \item Simultaneous orbit matching at IP8 for beam1 and beam2 of
+     the LHC\\
+     Match simultaneously the orbit of beam1 and beam of the LHC at
+     IP8  with initial conditions to the same given values at the IP:
+     \href{https://github.com/MethodicalAcceleratorDesign/madx-examples/blob/master/match/lhc.iporbit/job.lhc.iporbit.madx}
+     {Orbit matching at IP8} for beam1 and beam2 of the LHC
+     
+   \item IR8 beta squeeze for beam1 using JACOBIAN matching routine\\
+     Try to find a beta squeeze for IR8 starting from 10 meters.
+     \href{https://github.com/MethodicalAcceleratorDesign/madx-examples/blob/master/match/lhcV65.ir8squeeze/job.lhcV65.ir8squeeze.madx}
+     {Beta squeeze for IR8}
+     
+   \item Matching first and second order chromaticity of the LHC
+     using USE\_MACRO option. \\
+     Match simultaneously the first and second order chromaticity by
+     defining macros which compute them using the TWISS command or
+     PTC.
+     \href{https://github.com/MethodicalAcceleratorDesign/madx-examples/blob/master/match/lhc.qpp/job.lhc.qpp.madx}
+     {Second order chromaticity}
+     
+   \item Matching s position using VLENGTH flag.\\
+     match the positions of elements and the total sequence length
+     for a simple sample sequence.
+     \href{https://github.com/MethodicalAcceleratorDesign/madx-examples/blob/master/match/s-match/job.s-match.madx}
+     {s position matching}
+     
+   \item Matching s position using USE\_MACRO.\\
+     match the positions of elements and the total sequence length for a simple sample sequence using USE\_MACRO.
+     \href{https://github.com/MethodicalAcceleratorDesign/madx-examples/blob/master/match/s-match-usemacro/job.s-match-usemacro.madx}
+     {s position matching}
+     
+\end{itemize}
+
+%\href{http://bruening.home.cern.ch/bruening/}{Oliver Br\"uning}, June, 2002; 
+%\href{http://rdemaria.home.cern.ch/rdemaria/}{Riccardo de Maria}, August, 2007. 
+
+%% EOF

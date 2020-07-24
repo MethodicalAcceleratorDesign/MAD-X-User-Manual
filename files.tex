@@ -1,0 +1,163 @@
+\chapter{File Handling Statements}
+\label{chap:files}
+
+Note that the filenames given as attribute values in File Handling statements 
+must be explicit names and should not contain wildcard characters since the 
+filename strings are not passed to the underlying Operating System for evaluation.
+
+
+\section{ASSIGN}
+\label{sec:assign}
+
+\madbox{
+ASSIGN, ECHO="filename", TRUNCATE;
+}
+where \texttt{filename} is either the name of an output file, or the
+string \texttt{terminal}.
+This allows switching the echo stream to a file or back to the terminal,
+but only for the commands \hyperref[sec:value]{\texttt{VALUE}}, 
+\hyperref[sec:show]{\texttt{SHOW}}, and \hyperref[sec:print]{\texttt{PRINT}}. 
+Allows easy composition of future \madx input files.
+
+\texttt{TRUNCATE} specifies whether the file is truncated when opened 
+(ignored for terminal). 
+
+
+\section{CALL}
+\label{sec:call}
+\madbox{
+CALL, FILE="filename"; 
+}
+where \texttt{filename} is the name of an input file. The named file is
+then read until a \texttt{RETURN} statement is encountered, or until the
+End\_Of\_File; The file being "called" may in turn contain any number of
+\texttt{CALL} statements itself, and so on to any depth.
+
+
+\section{CHDIR}
+\label{sec:chdir}
+\madbox{
+CHDIR, DIR="path/to/folder";
+}
+changes the current working directory to the specified folder. Both relative
+and absolute pathes are possible.
+
+
+\section{RETURN}
+\label{Sec:return}
+\madbox{
+RETURN;
+}
+ends the reading from a "called" file. If encountered in the standard
+input file, it ends the program execution.  
+
+
+\section{PRINT}
+\label{sec:print}
+\madbox{
+PRINT, TEXT="string";
+}
+prints the quoted text \texttt{string} to the current output file (see
+\hyperref[sec:assign]{\texttt{ASSIGN}} above). The text can be edited
+with the help of a \hyperref[sec:macro]{macro} statement.
+%For more details, see there. [TBC]  
+
+
+\section{PRINTF}
+\label{sec:printf}
+\madbox{
+PRINTF, TEXT="string", VALUE= expr{,expr};
+}
+prints the numerical values specified in the \texttt{VALUE} field to the
+current output file, with formatting according to the format string
+provided in the \texttt{TEXT} field. 
+
+The string format can take numeric C or \madx format specifiers for
+double real values. Integer and string formats are not supported but 
+can be approximated with the \texttt{\%g} format in the case of
+integers, and via \hyperref[sec:macro]{\texttt{MACRO}} statements, which
+perform string substitution, themselves containing a
+\hyperref[sec:print]{\texttt{PRINT}} statement.   
+
+The maximum number of values that can be printed in one
+statement is limited to 100. 
+
+If the number of format specifiers given in the string is higher 
+than the number of values in the value field, undefined values are
+printed where they are not explicitly provided. 
+
+If the number of format specifiers given in the string is lower 
+than the number of values in the value field, the values that 
+do not correspond to a format specifier are ignored. 
+
+
+\textbf{Example:}
+{\small
+\madxmp{
+xxxxxxx\=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\= \kill
+a = 1.2; b = 3.4/0.3; c := 0.8*a/b; \\
+PRINTF, \>TEXT="String with floats a=\%f, b=\%.3g, text and MAD float c=\%F;", \\
+        \>VALUE = a,b,c; \\
+PRINTF, \>TEXT="More specifiers than values: \%f, \%.3g, \%F", \>VALUE = a,b; \\
+PRINTF, \>TEXT="More values than specifiers: \%f, \%.3g",      \>VALUE = a,b,c;
+}}
+
+produces the following output:
+\begin{verbatim}
+String with floats a=1.200000, b=11.3, text and MAD float c=  0.08470588235;
+More specifiers than values: 1.200000, 11.3,   6.953222976e-310
+More values than specifiers: 1.200000, 11.3
+\end{verbatim}
+
+Note that \texttt{PRINTF}, like \texttt{PRINT}, produces output that
+cannot be read back by \madx. For output that can be read back by \madx,
+use the command \texttt{VALUE} or TFS tables.
+
+Note also that a percent sign (\%) can be printed using the format
+\verb|text="%%"|. 
+
+
+\section{RENAMEFILE}
+\label{sec:renamefile}
+%\madbox{RENAMEFILE, FILE="filename", NAME = "new\_filename";}
+\madbox{
+RENAMEFILE, FILE="filename", TO="new\_filename";
+}
+renames the file \texttt{filename} to \texttt{new\_filename} on disk. \\
+This command is more portable than an equivalent
+\hyperref[sec:system]{\texttt{SYSTEM}} call: 
+\madxmp{
+SYSTEM("mv filename new\_filename"); ! Unix specific
+}
+
+\section{COPYFILE}
+\label{sec:copyfile}
+\madbox{
+COPYFILE, FILE="filename", TO="new\_filename", APPEND=logical;
+}
+copies the file \texttt{filename} to the file \texttt{new\_filename} on disk.
+
+The attribute \texttt{APPEND=true} causes \texttt{COPYFILE} to append
+the content of \texttt{filename} at the end of the file
+\texttt{new\_filename}.\\ 
+The default value \texttt{APPEND=false} causes the replacement of the
+content of \texttt{new\_filename} with the content of \texttt{filename}.
+
+\texttt{COPYFILE, APPEND=true...} is more portable than an equivalent
+\hyperref[sec:system]{\texttt{SYSTEM}} call: 
+\madxmp{
+SYSTEM("copy /y filename new\_filename"); ! Windows specific
+}
+
+\section{REMOVEFILE}
+\label{sec:removefile}
+\madbox{
+REMOVEFILE, FILE="filename";
+}
+removes the file \texttt{filename} from disk. \\
+It is more portable than an equivalent \hyperref[sec:system]{\texttt{SYSTEM}} call: 
+\madxmp{
+SYSTEM("rm filename"); ! Unix specific
+}
+
+%% EOF
